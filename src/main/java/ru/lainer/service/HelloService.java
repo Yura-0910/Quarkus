@@ -1,4 +1,4 @@
-package ru.lainer;
+package ru.lainer.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
