@@ -1,0 +1,12 @@
+services:
+  postgres-dev-db:
+    container_name: dev-db-cnt-quarkus
+    image: postgres:latest
+    volumes:
+      - ./db-data-dev:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "dev-db"
+      POSTGRES_USER: "dev-usr"
+      POSTGRES_PASSWORD: "dev-pwd"
+    ports:
+      - "5432:5432"

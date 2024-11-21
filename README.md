@@ -70,3 +70,10 @@ consult <https://quarkus.io/guides/maven-tooling>.
 Easily start your REST Web Services
 
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+
+### От себя::
+Запуск БД::\
+[1] cd /home/source/Документы/Quarkus/QuarkusPrj001\
+[2] sudo docker compose down --remove-orphans\
+[3] sudo docker compose up --no-start\
+[4] sudo docker compose up\
