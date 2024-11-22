@@ -46,11 +46,8 @@ public class CrudController {
   public Users getById(Long id) {
     Users user = entityManager.find(Users.class, id);
     if (user == null) {
-      Response response = Response.status(Response.Status.NOT_FOUND)
-          .entity("User not found")
-          .type(MediaType.TEXT_PLAIN_TYPE)
-          .build();
-      throw new WebApplicationException(response);
+      String message = "User с id = " + id + " не найден";
+      throw new WebApplicationException(generateResponse(message, 404));
     }
     return user;
   }
