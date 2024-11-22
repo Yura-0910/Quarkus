@@ -10,6 +10,7 @@ import ru.lainer.service.HelloService;
 
 @Path("/hello")
 public class HelloController {
+
   @Inject
   private HelloService helloService;
 

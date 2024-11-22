@@ -68,6 +68,9 @@ public class CrudController {
     return Response.ok().status(201).entity("User сохранен в БД").build();
   }
 
+  /**
+   * Генерирует ответ
+   */
   public Response generateResponse(String message, int status) {
     return Response.status(status)
         .entity(message)
