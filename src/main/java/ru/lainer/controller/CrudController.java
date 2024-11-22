@@ -3,13 +3,15 @@ package ru.lainer.controller;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.ws.rs.Consumes;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import java.util.List;
 import ru.lainer.entity.Users;
 
@@ -24,30 +26,55 @@ public class CrudController {
 
   /**
    * Находим всех Users с помощью пользовательского запроса
+   *
    * @return список Users
    */
   @GET
   @Path("/getAllUsers")
   public List<Users> getAllUsers() {
-    return entityManager.createNamedQuery("Users.findAll",Users.class).getResultList();
+    return entityManager.createNamedQuery("Users.findAll", Users.class).getResultList();
   }
 
   /**
    * Находим User-a по id
-   * @param id  пользователя, которого нужно найти
+   *
+   * @param id пользователя, которого нужно найти
    * @return найденного по id User-а
    */
   @GET
   @Path("/getById/{id}")
-    public Users getById(Long id) {
-      Users user = entityManager.find(Users.class, id);
-      if (user == null) {
-        Response response = Response.status(Response.Status.NOT_FOUND)
-            .entity("User not found")
-            .type(MediaType.TEXT_PLAIN_TYPE)
-            .build();
-        throw new WebApplicationException(response);
-      }
-      return user;
+  public Users getById(Long id) {
+    Users user = entityManager.find(Users.class, id);
+    if (user == null) {
+      Response response = Response.status(Response.Status.NOT_FOUND)
+          .entity("User not found")
+          .type(MediaType.TEXT_PLAIN_TYPE)
+          .build();
+      throw new WebApplicationException(response);
     }
+    return user;
+  }
+
+  /**
+   * Сохраняем User-a в БД
+   * @return статус 201, если удалось сохранить
+   */
+  @POST
+  @Path("/saveNewUsr")
+  @Transactional
+  public Response saveUser(Users user) {
+    if (user.getId() != null) {
+      String message = "Это добавление нового User:: ID должен быть null";
+      throw new WebApplicationException(generateResponse(message, 422));
+    }
+    entityManager.persist(user);
+    return Response.ok().status(201).entity("User сохранен в БД").build();
+  }
+
+  public Response generateResponse(String message, int status) {
+    return Response.status(status)
+        .entity(message)
+        .type(MediaType.TEXT_PLAIN_TYPE)
+        .build();
+  }
 }
