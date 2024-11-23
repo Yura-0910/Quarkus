@@ -3,7 +3,9 @@ package ru.lainer.controller;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -95,6 +97,22 @@ public class CrudController {
     //entityManager.merge(user);
 
     return Response.ok().status(200).entity("User с id = " + id +  ":: обновлен").build();
+  }
+
+  @DELETE
+  @Path("/delete/{id}")
+  @Transactional
+  public Response delete(Long id) {
+    try{
+      //Users user = entityManager.find(Users.class, id);
+      Users user = entityManager.getReference(Users.class, id);
+      entityManager.remove(user);
+    }
+    catch (EntityNotFoundException entityNotFoundException){
+      String message = "User с id = " + id + " не найден";
+      throw new WebApplicationException(generateResponse(message, 404));
+    }
+    return Response.ok().status(200).entity("User с id = " + id + " удален").build();
   }
 
   /**
