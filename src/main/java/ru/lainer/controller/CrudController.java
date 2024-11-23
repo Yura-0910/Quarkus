@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.Consumes;
@@ -66,6 +67,34 @@ public class CrudController {
     }
     entityManager.persist(user);
     return Response.ok().status(201).entity("User сохранен в БД").build();
+  }
+
+  /**
+   * @param user это данные из запроса, которые мы будем использовать для обновления User-а в БД
+   * @param id User-а, который нужно обновить
+   */
+  @PUT
+  @Path("/update/{id}")
+  @Transactional
+  public Response update(Users user, Long id) {
+    if (id == null) {
+      String message = "Это обновление существующего User-а:: ID не может быть null";
+      throw new WebApplicationException(generateResponse(message, 422));
+    }
+
+    //Получаем из БД User-а по id
+    Users userFromDB = entityManager.find(Users.class, id);
+    if (userFromDB == null) {
+      String message = "User с id = " + id + " не найден";
+      throw new WebApplicationException(generateResponse(message, 404));
+    }
+
+    //Обновляем User-а в БД (обновляя userFromDB:: обновляются данные и в БД)
+    userFromDB.setLogin(user.getLogin());
+    userFromDB.setPassword(user.getPassword());
+    //entityManager.merge(user);
+
+    return Response.ok().status(200).entity("User с id = " + id +  ":: обновлен").build();
   }
 
   /**
