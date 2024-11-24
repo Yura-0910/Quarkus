@@ -71,4 +71,21 @@ class CrudTests {
     assertThat(user.getLogin(),is("user3"));
     assertThat(user.getPassword(),is("pwd3"));
   }
+
+  @Test
+  @Order(5)
+  void testSaveUser(){
+    Users user = new Users();
+    user.setLogin("R2-D2");
+    user.setPassword("pwd4");
+
+    given()
+        .body(user)
+        .contentType("application/json")
+        .when()
+        .post("/api/saveNewUsr")
+        .then()
+        .statusCode(201)
+        .body(is("User сохранен в БД"));;
+  }
 }
