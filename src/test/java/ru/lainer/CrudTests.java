@@ -106,4 +106,15 @@ class CrudTests {
         .statusCode(200)
         .body(is("User с id = " + user.getId() +  ":: обновлен"));;
   }
+
+  @Test
+  @Order(7)
+  void testDelete(){
+    given()
+        .when()
+        .delete("/api/delete/3")
+        .then()
+        .statusCode(200)
+        .body(is("User с id = 3 удален"));;
+  }
 }
