@@ -88,4 +88,22 @@ class CrudTests {
         .statusCode(201)
         .body(is("User сохранен в БД"));;
   }
+
+  @Test
+  @Order(6)
+  void testUpdate(){
+    Users user = new Users();
+    user.setId(1L);
+    user.setLogin("C3Po");
+    user.setPassword("pwd-update");
+
+    given()
+        .body(user)
+        .contentType("application/json")
+        .when()
+        .put("/api/update/1")
+        .then()
+        .statusCode(200)
+        .body(is("User с id = " + user.getId() +  ":: обновлен"));;
+  }
 }
