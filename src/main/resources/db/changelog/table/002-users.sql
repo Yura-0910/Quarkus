@@ -17,5 +17,6 @@ CREATE TABLE PUBLIC.USERS
 (
     user_id_pk BIGSERIAL PRIMARY KEY,
     login      text,
-    password   text
+    password   text,
+    role       text
 );

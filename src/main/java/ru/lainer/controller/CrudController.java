@@ -94,6 +94,7 @@ public class CrudController {
     //Обновляем User-а в БД (обновляя userFromDB:: обновляются данные и в БД)
     userFromDB.setLogin(user.getLogin());
     userFromDB.setPassword(user.getPassword());
+    userFromDB.setRole(user.getRole());
     //entityManager.merge(user);
 
     return Response.ok().status(200).entity("User с id = " + id +  ":: обновлен").build();
