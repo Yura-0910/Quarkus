@@ -41,8 +41,8 @@ public class UserRegistration {
     HashSet<String> setWithRole = new HashSet<>();
     setWithRole.add(user.getRole());
 
-    String token = Jwt.issuer("https://lainer.ru/issuer")
-        .upn("mazurovyura09@yandex.ru")
+    String token = Jwt.issuer("https://lainer.ru/issuer") //Поставщик JWT - токенов
+        .upn(user.getEmail())
         .groups(setWithRole)
         .claim(Claims.nickname, user.getLogin())
         .sign();

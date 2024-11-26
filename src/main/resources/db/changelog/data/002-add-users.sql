@@ -14,6 +14,9 @@ VALUES (nextval('PUBLIC.users_seq'), 'user3', '{noop}pwd3');
  */
 
 --For the case when the "id" is generated automatically via "BIGSERIAL"
-INSERT INTO PUBLIC.USERS (login, password, role) VALUES ('user1', 'pwd1', 'User');
-INSERT INTO PUBLIC.USERS (login, password, role) VALUES ('user2', 'pwd2', 'Moderator');
-INSERT INTO PUBLIC.USERS (login, password, role) VALUES ('user3', 'pwd3', 'Admin');
+INSERT INTO PUBLIC.USERS (login, email, password, role)
+VALUES ('user1', 'email1@ya.ru', 'pwd1', 'User');
+INSERT INTO PUBLIC.USERS (login, email, password, role)
+VALUES ('user2', 'email2@ya.ru', 'pwd2', 'Moderator');
+INSERT INTO PUBLIC.USERS (login, email, password, role)
+VALUES ('user3', 'email3@ya.ru', 'pwd3', 'Admin');
