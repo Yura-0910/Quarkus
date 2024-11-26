@@ -81,4 +81,5 @@ Easily start your REST Web Services
 Генерация privateKey.pem и publicKey.pem \
 [1] cd /home/source/Документы/Quarkus/QuarkusPrj001/src/main/resources\
 [2] openssl genrsa -out privateKey.pem 2048\
-[3] openssl rsa -in privateKey.pem -pubout > publicKey.pem
+[3] openssl rsa -in privateKey.pem -pubout > publicKey.pem\
+[4] Что внутри токена:: можно посмотреть вот тут -> https://jwt.io/ 

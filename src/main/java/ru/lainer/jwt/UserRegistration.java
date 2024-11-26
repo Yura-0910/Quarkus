@@ -8,8 +8,10 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import ru.lainer.controller.CrudController;
 import ru.lainer.entity.Users;
 import io.smallrye.jwt.build.Jwt;
@@ -34,9 +36,14 @@ public class UserRegistration {
   @Transactional
   public Response addUserToDB(Users user) {
     entityManager.persist(user);
+
+    //Извлекаем роль User-а из запроса
+    HashSet<String> setWithRole = new HashSet<>();
+    setWithRole.add(user.getRole());
+
     String token = Jwt.issuer("https://lainer.ru/issuer")
         .upn("mazurovyura09@yandex.ru")
-        .groups(new HashSet<>(Arrays.asList(user.getRole())))
+        .groups(setWithRole)
         .claim(Claims.nickname, user.getLogin())
         .sign();
 
