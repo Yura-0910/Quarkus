@@ -77,3 +77,8 @@ Easily start your REST Web Services
 [2] sudo docker compose down --remove-orphans\
 [3] sudo docker compose up --no-start\
 [4] sudo docker compose up\
+
+Генерация privateKey.pem и publicKey.pem \
+[1] cd /home/source/Документы/Quarkus/QuarkusPrj001/src/main/resources\
+[2] openssl genrsa -out privateKey.pem 2048\
+[3] openssl rsa -in privateKey.pem -pubout > publicKey.pem
