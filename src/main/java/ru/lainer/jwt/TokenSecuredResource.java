@@ -1,5 +1,6 @@
 package ru.lainer.jwt;
 
+import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
@@ -33,8 +34,8 @@ import jakarta.ws.rs.InternalServerErrorException;
  * и к данному "endPoint" предоставляется доступ (т.е. успешно проходит еще и авторизация)::
  * при успешной авторизации - срабатывает тело метода
  *
- * То есть сначала происходит аутентификация по ролям в автоматическом режиме, Если аутентификация
- * прошла успешно, то дальше идет авторизация считается успешной, если прошла аутентификация
+ * То есть сначала происходит аутентификация по ролям в автоматическом режиме. Если аутентификация
+ * прошла успешно, то дальше считается, что и авторизация прошла успешно.
  *
  * 7) Если, например в JWT:: "Role" = "User", а у "endPoint"(@RolesAllowed({"Admin"})),
  * то аутентификация считается,что не прошла (по ролям аутентификация идет в Quarkus),
@@ -85,6 +86,13 @@ public class TokenSecuredResource {
     return getResponseString(ctx) + ", nickname: " + nickname;
   }
 
+  @GET
+  @Path("/deny-all")
+  @DenyAll
+  @Produces(MediaType.TEXT_PLAIN)
+  public String helloShouldDeny(@Context SecurityContext ctx) {
+    throw new InternalServerErrorException("This method must not be invoked");
+  }
 
   private String getResponseString(SecurityContext ctx) {
     String name;
