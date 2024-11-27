@@ -16,18 +16,39 @@ import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.InternalServerErrorException;
 
 /**
- * Это JWT RBAC (Role-Based Access Control)
- * библиотека SmallRye JWT:: используется для верификации JSON:: в случае успеха получаем
+ * 1) Это JWT RBAC (Role-Based Access Control)
+ * 2) библиотека SmallRye JWT:: используется для верификации JSON:: в случае успеха получаем
  * "JsonWebToken"
- * библиотека SmallRye JWT:: используется для защищенного доступа к "endpoint"-ам используя
+ * 3) библиотека SmallRye JWT:: используется для защищенного доступа к "endpoint"-ам используя
  * "Bearer Token Authorization" и "RBAC(Role-Based Access Control)".
  *
- * Библиотека "smallrye-jwt" представляет "bearer tokens" как "JsonWebToken".
+ * 4) Библиотека "smallrye-jwt" представляет "bearer tokens" как "JsonWebToken".
  *
- * То есть не используется аутентификация по логину\паролю
+ * 5) То есть не используется аутентификация по логину\паролю
+ *
+ * 6) Работает так:: на URL\"endPoint" отправляется запрос с JWT -> из JWT, Quarkus, автоматически
+ * извлекает "Role". Если, например у "endPoint"(@RolesAllowed({"User", "Admin"})) и в запросе
+ * у JWT токена "Role" = "User" или "Admin", то в SecurityContext помещаются данные(логин, роль,
+ * схема аутентификации) о успешной аутентификации (т.к. аутентификация происходит по ролям)
+ * и к данному "endPoint" предоставляется доступ (т.е. успешно проходит еще и авторизация)::
+ * при успешной авторизации - срабатывает тело метода
+ *
+ * То есть сначала происходит аутентификация по ролям в автоматическом режиме, Если аутентификация
+ * прошла успешно, то дальше идет авторизация
+ *
+ * 7) Если, например в JWT:: "Role" = "User", а у "endPoint"(@RolesAllowed({"Admin"})),
+ * то аутентификация считается,что не прошла (по ролям аутентификация идет в Quarkus),
+ * и в SecurityContext поля заполняются "Null" и еще авторизация считается неудачной.
+ *
+ * 8) При успешной аутентификации по ролям:: данные, автоматически, помещаются в SecurityContext.
+ * Дополнительно можно самому извлечь данные из JWT Token-а. Аутентификация по ролям - происходит
+ * автоматически.
+ *
+ * 9) К каждому "endPoint"\запросу происходит своя аутентификация и авторизация,
+ * так как используется @RequestScoped
  */
 @Path("/secured")
-@RequestScoped//Область действия bean-а:: запрос
+@RequestScoped//Время действия bean-а:: запрос
 public class TokenSecuredResource {
 
   //Сюда автоматически внедряется JWT токен (Bearer) из POST-запроса
@@ -73,13 +94,18 @@ public class TokenSecuredResource {
      * Если user не был аутентифицирован, то метод возвращает null.
      * 3) "Principal" содержит "name" "user"-а делающего этот request или содержит "null"
      *  если "user" не был "authenticated"
+     *
+     * От себя:: "getUserPrincipal()" содержит "name" -> "current"(текущего) аутентифицированного
+     * пользователя (сделавшего запрос), а "jwt.getName()" содержит "name" из JWT, то есть
+     * может возникнуть ситуация, когда в "SecurityContext" записались данные из одного запроса
+     * с успешной аутентификацией, а в "JWT-Token"-е - другой "name"
      */
     if (ctx.getUserPrincipal() == null) {
       name = "anonymous";
     } else if (!ctx.getUserPrincipal().getName().equals(jwt.getName())) {
       String message = "login из SecurityContext не совпадает с login-ом из JsonWebToken "
           + "(то есть из JWT)";
-      throw new InternalServerErrorException("Principal and JsonWebToken names do not match");
+      throw new InternalServerErrorException(message);
     } else {
       name = ctx.getUserPrincipal().getName();
     }
