@@ -15,6 +15,17 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.InternalServerErrorException;
 
+/**
+ * Это JWT RBAC (Role-Based Access Control)
+ * библиотека SmallRye JWT:: используется для верификации JSON:: в случае успеха получаем
+ * "JsonWebToken"
+ * библиотека SmallRye JWT:: используется для защищенного доступа к "endpoint"-ам используя
+ * "Bearer Token Authorization" и "RBAC(Role-Based Access Control)".
+ *
+ * Библиотека "smallrye-jwt" представляет "bearer tokens" как "JsonWebToken".
+ *
+ * То есть не используется аутентификация по логину\паролю
+ */
 @Path("/secured")
 @RequestScoped//Область действия bean-а:: запрос
 public class TokenSecuredResource {
@@ -23,8 +34,9 @@ public class TokenSecuredResource {
   @Inject
   JsonWebToken jwt;
 
+  //Claims - это утверждение:: автоматически внедряется из JWT-токена (из запроса)
   @Inject
-  @Claim(standard = Claims.nickname)//Claims - это утверждение
+  @Claim(standard = Claims.nickname)
   String nickname;
 
   @GET
@@ -44,8 +56,24 @@ public class TokenSecuredResource {
         + "nickname(из токена): " + jwt.getClaim("nickname").toString();
   }
 
+  @GET
+  @Path("/roles-allowed-admin")
+  @RolesAllowed("Admin")
+  @Produces(MediaType.TEXT_PLAIN)
+  public String helloRolesAllowedAdmin(@Context SecurityContext ctx) {
+    return getResponseString(ctx) + ", nickname: " + nickname;
+  }
+
+
   private String getResponseString(SecurityContext ctx) {
     String name;
+    /*
+     * 1) Метод "getUserPrincipal()" из "SecurityContext" возвращает "Principal".
+     * 2) "Principal" содержит "name of the current authenticated user".
+     * Если user не был аутентифицирован, то метод возвращает null.
+     * 3) "Principal" содержит "name" "user"-а делающего этот request или содержит "null"
+     *  если "user" не был "authenticated"
+     */
     if (ctx.getUserPrincipal() == null) {
       name = "anonymous";
     } else if (!ctx.getUserPrincipal().getName().equals(jwt.getName())) {
