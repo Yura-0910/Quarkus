@@ -92,6 +92,7 @@ public class JwtTests {
   }
 
   @Test
+  @Order(5)
   public void testExpiredToken() {
     Response response = given().auth()
         .oauth2(generateExpiredToken())
@@ -101,6 +102,7 @@ public class JwtTests {
     response.then().statusCode(401);
   }
 
+  //Истекло время существования токена
   String generateExpiredToken() {
     return Jwt
         .upn("test@yandex.ru")
@@ -108,5 +110,17 @@ public class JwtTests {
         .groups(new HashSet<>(Arrays.asList("User", "Admin")))
         .expiresAt(Instant.now().minusSeconds(10))
         .sign();
+  }
+
+  //Токен модифицирован
+  @Test
+  @Order(6)
+  public void testModifiedToken() {
+    Response response = given().auth()
+        .oauth2(generateValidUserToken() + "1")
+        .when()
+        .get("/secured/roles-allowed").andReturn();
+
+    response.then().statusCode(401);
   }
 }
