@@ -58,10 +58,33 @@ public class JwtTests {
   @Order(3)
   void testOnlyAdminRoleIsAllowed(){
     Response response = given().auth()
-        .oauth2(generateValidUserToken())
+        .oauth2(generateValidUserToken())//Разрешен только Admin, но передали User
         .when()
         .get("/secured/roles-allowed-admin").andReturn();
 
     response.then().statusCode(403);
+  }
+
+  @Test
+  @Order(4)
+  void testOnlyAdminRoleIsAllowed2(){
+    Response response = given().auth()
+        .oauth2(generateValidAdminToken())
+        .when()
+        .get("/secured/roles-allowed-admin").andReturn();
+
+    response.then()
+        .statusCode(200)
+        .body(containsString(
+            "hello test_admin@yandex.ru, authScheme: Bearer, nickname: test_source"));
+  }
+
+  String generateValidAdminToken(){
+    return Jwt
+        .issuer("https://lainer.ru/issuer")
+        .upn("test_admin@yandex.ru")
+        .groups("Admin")
+        .claim(Claims.nickname, "test_source")
+        .sign();
   }
 }
