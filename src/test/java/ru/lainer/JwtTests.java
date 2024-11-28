@@ -53,4 +53,15 @@ public class JwtTests {
         .claim(Claims.nickname, "test_source")
         .sign();
   }
+
+  @Test
+  @Order(3)
+  void testOnlyAdminRoleIsAllowed(){
+    Response response = given().auth()
+        .oauth2(generateValidUserToken())
+        .when()
+        .get("/secured/roles-allowed-admin").andReturn();
+
+    response.then().statusCode(403);
+  }
 }
