@@ -2,6 +2,9 @@ package ru.lainer;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.smallrye.jwt.build.Jwt;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashSet;
 import org.eclipse.microprofile.jwt.Claims;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -69,7 +72,7 @@ public class JwtTests {
   @Order(4)
   void testOnlyAdminRoleIsAllowed2(){
     Response response = given().auth()
-        .oauth2(generateValidAdminToken())
+        .oauth2(generateValidAdminToken())//Передаем токен с Админом
         .when()
         .get("/secured/roles-allowed-admin").andReturn();
 
@@ -85,6 +88,25 @@ public class JwtTests {
         .upn("test_admin@yandex.ru")
         .groups("Admin")
         .claim(Claims.nickname, "test_source")
+        .sign();
+  }
+
+  @Test
+  public void testExpiredToken() {
+    Response response = given().auth()
+        .oauth2(generateExpiredToken())
+        .when()
+        .get("/secured/roles-allowed").andReturn();
+
+    response.then().statusCode(401);
+  }
+
+  String generateExpiredToken() {
+    return Jwt
+        .upn("test@yandex.ru")
+        .issuer("https://lainer.ru/issuer")
+        .groups(new HashSet<>(Arrays.asList("User", "Admin")))
+        .expiresAt(Instant.now().minusSeconds(10))
         .sign();
   }
 }
