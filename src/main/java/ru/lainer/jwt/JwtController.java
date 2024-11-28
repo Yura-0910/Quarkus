@@ -50,7 +50,7 @@ import jakarta.ws.rs.InternalServerErrorException;
  */
 @Path("/secured")
 @RequestScoped//Время действия bean-а:: запрос
-public class TokenSecuredResource {
+public class JwtController {
 
   //Сюда автоматически внедряется JWT токен (Bearer) из POST-запроса
   @Inject
